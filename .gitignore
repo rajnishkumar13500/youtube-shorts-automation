@@ -1,0 +1,59 @@
+# Environment variables
+.env
+
+# API Credentials - NEVER COMMIT THESE
+*.json
+!.vscode/*.json
+youtube_token.pickle
+youtube_token*.txt
+*_base64.txt
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+
+# Virtual Environment
+venv/
+env/
+ENV/
+
+# Output files
+output/
+*.mp4
+*.mp3
+*.png
+*.jpg
+*.srt
+*.log
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Whisper model cache
+~/.cache/whisper/

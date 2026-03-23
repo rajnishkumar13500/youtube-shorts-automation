@@ -1,0 +1,112 @@
+name: Generate Single Video (Manual)
+
+on:
+  workflow_dispatch:
+    inputs:
+      topic:
+        description: 'Video topic'
+        required: true
+        type: string
+      duration:
+        description: 'Video duration in seconds'
+        required: false
+        default: '20'
+        type: string
+      upload:
+        description: 'Upload to YouTube?'
+        required: false
+        default: true
+        type: boolean
+
+jobs:
+  generate-video:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.10'
+          cache: 'pip'
+      
+      - name: Install system dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y ffmpeg
+      
+      - name: Install Python dependencies
+        run: |
+          pip install --upgrade pip
+          pip install -r requirements.txt
+          pip install openai-whisper
+      
+      - name: Create .env file
+        run: |
+          cat > .env << EOF
+          GROQ_API_KEY=${{ secrets.GROQ_API_KEY }}
+          ELEVENLABS_API_KEY=${{ secrets.ELEVENLABS_API_KEY }}
+          ELEVENLABS_API_KEY_2=${{ secrets.ELEVENLABS_API_KEY_2 }}
+          ELEVENLABS_API_KEY_3=${{ secrets.ELEVENLABS_API_KEY_3 }}
+          CLOUDFLARE_ACCOUNT_ID=${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          CLOUDFLARE_API_TOKEN=${{ secrets.CLOUDFLARE_API_TOKEN }}
+          SUBTITLE_DELAY=0.3
+          YOUTUBE_CLIENT_SECRETS=youtube_client_secrets.json
+          EOF
+      
+      - name: Create YouTube client secrets
+        if: ${{ github.event.inputs.upload == 'true' }}
+        run: |
+          echo '${{ secrets.YOUTUBE_CLIENT_SECRETS }}' > youtube_client_secrets.json
+      
+      - name: Restore YouTube token
+        if: ${{ github.event.inputs.upload == 'true' }}
+        run: |
+          echo '${{ secrets.YOUTUBE_TOKEN }}' | base64 -d > youtube_token.pickle
+      
+      - name: Create output directories
+        run: |
+          mkdir -p output/audio output/images output/logs
+      
+      - name: Generate video
+        run: |
+          echo "Generating video for topic: ${{ github.event.inputs.topic }}"
+          python main.py "${{ github.event.inputs.topic }}" --duration ${{ github.event.inputs.duration }} --verbose
+      
+      - name: Upload to YouTube
+        if: ${{ github.event.inputs.upload == 'true' }}
+        run: |
+          python -c "
+          from youtube_uploader import YouTubeUploader
+          
+          uploader = YouTubeUploader()
+          result = uploader.upload_video(
+              video_path='output/final_video_final.mp4',
+              title='${{ github.event.inputs.topic }} #Shorts',
+              description='Amazing facts about ${{ github.event.inputs.topic }}!\n\n🔔 Subscribe for more!\n\n#Shorts #Facts #Viral',
+              tags=['shorts', 'facts', 'viral', 'trending'],
+              category_id='22',
+              privacy_status='public'
+          )
+          print(f\"✓ Video uploaded successfully!\")
+          print(f\"✓ URL: {result['video_url']}\")
+          "
+      
+      - name: Upload video as artifact
+        if: ${{ github.event.inputs.upload == 'false' }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: video-${{ github.run_number }}
+          path: output/final_video_final.mp4
+          retention-days: 7
+      
+      - name: Upload logs
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: logs-${{ github.run_number }}
+          path: output/logs/
+          retention-days: 7

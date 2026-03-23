@@ -1,0 +1,27 @@
+# YouTube Shorts Automation Dependencies
+
+# Core Python Utilities
+python-dotenv>=1.0.0
+schedule>=1.2.0
+
+# API Clients
+groq>=0.4.0
+elevenlabs>=0.2.0
+requests>=2.31.0
+
+# Video Processing
+ffmpeg-python>=0.2.0
+pillow>=10.0.0
+
+# Whisper AI for audio sync
+openai-whisper>=20231117
+
+# Google APIs for Sheets and YouTube
+google-auth>=2.23.0
+google-auth-oauthlib>=1.1.0
+google-auth-httplib2>=0.1.1
+google-api-python-client>=2.100.0
+
+# Optional: For advanced video processing
+# moviepy>=1.0.3
+

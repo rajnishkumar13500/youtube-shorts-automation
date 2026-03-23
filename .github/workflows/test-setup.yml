@@ -1,0 +1,127 @@
+name: Test Setup
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+    paths:
+      - '.github/workflows/**'
+      - 'requirements.txt'
+      - '*.py'
+
+jobs:
+  test-environment:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.10'
+      
+      - name: Install system dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y ffmpeg
+      
+      - name: Verify FFmpeg
+        run: |
+          ffmpeg -version
+          echo "✓ FFmpeg installed"
+      
+      - name: Install Python dependencies
+        run: |
+          pip install --upgrade pip
+          pip install -r requirements.txt
+          pip install openai-whisper
+      
+      - name: Verify Python packages
+        run: |
+          python -c "import groq; print('✓ Groq installed')"
+          python -c "import elevenlabs; print('✓ ElevenLabs installed')"
+          python -c "import whisper; print('✓ Whisper installed')"
+          python -c "import google.oauth2; print('✓ Google Auth installed')"
+      
+      - name: Check secrets
+        run: |
+          echo "Checking secrets..."
+          
+          if [ -z "${{ secrets.GROQ_API_KEY }}" ]; then
+            echo "❌ GROQ_API_KEY not set"
+            exit 1
+          else
+            echo "✓ GROQ_API_KEY set"
+          fi
+          
+          if [ -z "${{ secrets.ELEVENLABS_API_KEY }}" ]; then
+            echo "❌ ELEVENLABS_API_KEY not set"
+            exit 1
+          else
+            echo "✓ ELEVENLABS_API_KEY set"
+          fi
+          
+          if [ -z "${{ secrets.CLOUDFLARE_ACCOUNT_ID }}" ]; then
+            echo "❌ CLOUDFLARE_ACCOUNT_ID not set"
+            exit 1
+          else
+            echo "✓ CLOUDFLARE_ACCOUNT_ID set"
+          fi
+          
+          if [ -z "${{ secrets.CLOUDFLARE_API_TOKEN }}" ]; then
+            echo "❌ CLOUDFLARE_API_TOKEN not set"
+            exit 1
+          else
+            echo "✓ CLOUDFLARE_API_TOKEN set"
+          fi
+          
+          if [ -z "${{ secrets.GOOGLE_SHEETS_CREDENTIALS }}" ]; then
+            echo "⚠️ GOOGLE_SHEETS_CREDENTIALS not set (optional for manual runs)"
+          else
+            echo "✓ GOOGLE_SHEETS_CREDENTIALS set"
+          fi
+          
+          if [ -z "${{ secrets.YOUTUBE_CLIENT_SECRETS }}" ]; then
+            echo "⚠️ YOUTUBE_CLIENT_SECRETS not set (optional for manual runs)"
+          else
+            echo "✓ YOUTUBE_CLIENT_SECRETS set"
+          fi
+          
+          if [ -z "${{ secrets.YOUTUBE_TOKEN }}" ]; then
+            echo "⚠️ YOUTUBE_TOKEN not set (optional for manual runs)"
+          else
+            echo "✓ YOUTUBE_TOKEN set"
+          fi
+          
+          echo ""
+          echo "✓ All required secrets are configured!"
+      
+      - name: Test script generation
+        run: |
+          cat > .env << EOF
+          GROQ_API_KEY=${{ secrets.GROQ_API_KEY }}
+          EOF
+          
+          python -c "
+          from script_generator import generate_script
+          script = generate_script('test topic', duration=20)
+          print(f'✓ Script generated: {len(script)} characters')
+          print(f'Script: {script[:100]}...')
+          "
+      
+      - name: Summary
+        run: |
+          echo "=========================================="
+          echo "✓ Environment setup successful!"
+          echo "=========================================="
+          echo ""
+          echo "Ready to generate videos!"
+          echo ""
+          echo "Next steps:"
+          echo "1. Go to Actions tab"
+          echo "2. Run 'Generate Single Video (Manual)' workflow"
+          echo "3. Enter a topic and click 'Run workflow'"
