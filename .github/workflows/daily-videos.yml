@@ -86,15 +86,33 @@ jobs:
             # Manual trigger with specific topic
             python main.py "${{ github.event.inputs.topic }}" --duration ${{ github.event.inputs.duration }}
             
-            # Upload to YouTube
+            # Upload to YouTube with SEO-friendly title
             python -c "
           from youtube_uploader import YouTubeUploader
+          
+          topic = '${{ github.event.inputs.topic }}'
+          topic_title = topic.title()
+          emoji = '💪'
+          topic_lower = topic.lower()
+          if 'water' in topic_lower or 'drink' in topic_lower:
+              emoji = '💧'
+          elif 'yoga' in topic_lower or 'meditation' in topic_lower:
+              emoji = '🧘'
+          elif 'weight' in topic_lower or 'loss' in topic_lower:
+              emoji = '🔥'
+          
+          title = f\"{topic_title} {emoji} #Shorts #Health\"
+          if len(title) > 100:
+              max_len = 100 - len(f\" {emoji} #Shorts #Health\")
+              topic_title = topic_title[:max_len].rsplit(' ', 1)[0]
+              title = f\"{topic_title} {emoji} #Shorts #Health\"
+          
           uploader = YouTubeUploader(client_secrets_file='youtube_client_secrets.json')
           result = uploader.upload_video(
               video_path='output/final_video_final.mp4',
-              title='${{ github.event.inputs.topic }} #Shorts',
-              description='Amazing facts about ${{ github.event.inputs.topic }}!',
-              tags=['shorts', 'facts', 'viral'],
+              title=title,
+              description='Amazing health tips!\n\n🔔 Subscribe for more!\n\n#Shorts #Health #Fitness',
+              tags=['shorts', 'health', 'fitness', 'wellness'],
               category_id='22',
               privacy_status='public'
           )

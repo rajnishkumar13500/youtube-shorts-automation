@@ -82,16 +82,43 @@ jobs:
           python -c "
           from youtube_uploader import YouTubeUploader
           
+          # Generate SEO-friendly title
+          topic = '${{ github.event.inputs.topic }}'
+          topic_title = topic.title()
+          
+          # Add emoji based on topic
+          emoji = '💪'
+          topic_lower = topic.lower()
+          if 'water' in topic_lower or 'drink' in topic_lower:
+              emoji = '💧'
+          elif 'yoga' in topic_lower or 'meditation' in topic_lower:
+              emoji = '🧘'
+          elif 'weight' in topic_lower or 'loss' in topic_lower or 'fat' in topic_lower:
+              emoji = '🔥'
+          elif 'sleep' in topic_lower:
+              emoji = '😴'
+          elif 'energy' in topic_lower:
+              emoji = '⚡'
+          elif 'skin' in topic_lower or 'glow' in topic_lower:
+              emoji = '✨'
+          
+          title = f\"{topic_title} {emoji} #Shorts #Health\"
+          if len(title) > 100:
+              max_len = 100 - len(f\" {emoji} #Shorts #Health\")
+              topic_title = topic_title[:max_len].rsplit(' ', 1)[0]
+              title = f\"{topic_title} {emoji} #Shorts #Health\"
+          
           uploader = YouTubeUploader(client_secrets_file='youtube_client_secrets.json')
           result = uploader.upload_video(
               video_path='output/final_video_final.mp4',
-              title='${{ github.event.inputs.topic }} #Shorts',
-              description='Amazing facts about ${{ github.event.inputs.topic }}!\n\n🔔 Subscribe for more!\n\n#Shorts #Facts #Viral',
-              tags=['shorts', 'facts', 'viral', 'trending'],
+              title=title,
+              description='Amazing facts about ${{ github.event.inputs.topic }}!\n\n🔔 Subscribe for more!\n\n#Shorts #Health #Fitness #Wellness',
+              tags=['shorts', 'health', 'fitness', 'wellness', 'viral'],
               category_id='22',
               privacy_status='public'
           )
           print(f\"✓ Video uploaded successfully!\")
+          print(f\"✓ Title: {title}\")
           print(f\"✓ URL: {result['video_url']}\")
           "
       

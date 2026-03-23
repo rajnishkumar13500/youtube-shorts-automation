@@ -244,10 +244,47 @@ class VideoAutomationScheduler:
             raise RuntimeError(f"Failed to upload to YouTube: {e}")
     
     def _generate_title(self, topic: str) -> str:
-        """Generate YouTube video title."""
-        # Keep it short and engaging (max 100 chars)
-        title = f"{topic} #Shorts"
-        return title[:100]
+        """Generate SEO-friendly YouTube video title with hashtags."""
+        # Capitalize first letter of each word for better readability
+        topic_title = topic.title()
+        
+        # Create catchy title with emojis and hashtags
+        # Format: "Topic Title 🔥 #Shorts #Health #Fitness"
+        
+        # Add relevant emoji based on topic keywords
+        emoji = "💪"  # Default
+        topic_lower = topic.lower()
+        
+        if any(word in topic_lower for word in ["water", "drink", "hydration"]):
+            emoji = "💧"
+        elif any(word in topic_lower for word in ["yoga", "meditation", "breathing"]):
+            emoji = "🧘"
+        elif any(word in topic_lower for word in ["weight", "loss", "fat", "burn"]):
+            emoji = "🔥"
+        elif any(word in topic_lower for word in ["sleep", "rest", "tired"]):
+            emoji = "😴"
+        elif any(word in topic_lower for word in ["energy", "boost", "power"]):
+            emoji = "⚡"
+        elif any(word in topic_lower for word in ["skin", "glow", "beauty"]):
+            emoji = "✨"
+        elif any(word in topic_lower for word in ["heart", "cardio"]):
+            emoji = "❤️"
+        elif any(word in topic_lower for word in ["brain", "mental", "mind"]):
+            emoji = "🧠"
+        elif any(word in topic_lower for word in ["food", "diet", "nutrition"]):
+            emoji = "🥗"
+        
+        # Create title with emoji and 2-3 hashtags
+        title = f"{topic_title} {emoji} #Shorts #Health"
+        
+        # Keep within 100 character limit
+        if len(title) > 100:
+            # Truncate topic if too long
+            max_topic_length = 100 - len(f" {emoji} #Shorts #Health")
+            topic_title = topic_title[:max_topic_length].rsplit(' ', 1)[0]  # Cut at last word
+            title = f"{topic_title} {emoji} #Shorts #Health"
+        
+        return title
     
     def _generate_description(self, topic: str) -> str:
         """Generate YouTube video description."""
