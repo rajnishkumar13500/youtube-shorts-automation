@@ -1,0 +1,106 @@
+name: Debug Test
+
+on:
+  workflow_dispatch:
+
+jobs:
+  debug:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.10'
+      
+      - name: Check Python version
+        run: python --version
+      
+      - name: List files
+        run: |
+          echo "=== Root directory ==="
+          ls -la
+          echo ""
+          echo "=== Python files ==="
+          ls -la *.py
+      
+      - name: Install system dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y ffmpeg
+      
+      - name: Check FFmpeg
+        run: ffmpeg -version
+      
+      - name: Install Python dependencies
+        run: |
+          pip install --upgrade pip
+          pip install -r requirements.txt
+          echo "✓ Requirements installed"
+      
+      - name: Check imports
+        run: |
+          python -c "import groq; print('✓ Groq')"
+          python -c "import elevenlabs; print('✓ ElevenLabs')"
+          python -c "import requests; print('✓ Requests')"
+          python -c "from dotenv import load_dotenv; print('✓ Dotenv')"
+          python -c "from google.oauth2.service_account import Credentials; print('✓ Google Auth')"
+      
+      - name: Check secrets
+        run: |
+          echo "Checking secrets..."
+          if [ -z "${{ secrets.GROQ_API_KEY }}" ]; then
+            echo "❌ GROQ_API_KEY missing"
+          else
+            echo "✓ GROQ_API_KEY set (${#GROQ_API_KEY} chars)"
+          fi
+          
+          if [ -z "${{ secrets.ELEVENLABS_API_KEY }}" ]; then
+            echo "❌ ELEVENLABS_API_KEY missing"
+          else
+            echo "✓ ELEVENLABS_API_KEY set"
+          fi
+          
+          if [ -z "${{ secrets.CLOUDFLARE_ACCOUNT_ID }}" ]; then
+            echo "❌ CLOUDFLARE_ACCOUNT_ID missing"
+          else
+            echo "✓ CLOUDFLARE_ACCOUNT_ID set"
+          fi
+          
+          if [ -z "${{ secrets.CLOUDFLARE_API_TOKEN }}" ]; then
+            echo "❌ CLOUDFLARE_API_TOKEN missing"
+          else
+            echo "✓ CLOUDFLARE_API_TOKEN set"
+          fi
+        env:
+          GROQ_API_KEY: ${{ secrets.GROQ_API_KEY }}
+      
+      - name: Create .env file
+        run: |
+          cat > .env << EOF
+          GROQ_API_KEY=${{ secrets.GROQ_API_KEY }}
+          ELEVENLABS_API_KEY=${{ secrets.ELEVENLABS_API_KEY }}
+          CLOUDFLARE_ACCOUNT_ID=${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          CLOUDFLARE_API_TOKEN=${{ secrets.CLOUDFLARE_API_TOKEN }}
+          SUBTITLE_DELAY=0.3
+          EOF
+          echo "✓ .env file created"
+      
+      - name: Test script generation
+        run: |
+          python -c "
+          from script_generator import generate_script
+          script = generate_script('test topic', duration=20)
+          print(f'✓ Script generated: {len(script)} characters')
+          print(f'Script preview: {script[:100]}...')
+          "
+      
+      - name: Summary
+        run: |
+          echo "=========================================="
+          echo "✓ All checks passed!"
+          echo "=========================================="

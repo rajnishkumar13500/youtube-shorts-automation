@@ -89,7 +89,7 @@ jobs:
             # Upload to YouTube
             python -c "
           from youtube_uploader import YouTubeUploader
-          uploader = YouTubeUploader()
+          uploader = YouTubeUploader(client_secrets_file='youtube_client_secrets.json')
           result = uploader.upload_video(
               video_path='output/final_video_final.mp4',
               title='${{ github.event.inputs.topic }} #Shorts',
