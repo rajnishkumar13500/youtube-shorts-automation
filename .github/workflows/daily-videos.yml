@@ -1,14 +1,14 @@
 name: Daily Video Automation
 
 on:
-  # Schedule 3 videos per day
+  # Schedule 3 videos per day (India IST timezone)
   schedule:
-    # 9:00 AM UTC (adjust for your timezone)
-    - cron: '0 9 * * *'
-    # 3:00 PM UTC
-    - cron: '0 15 * * *'
-    # 9:00 PM UTC
-    - cron: '0 21 * * *'
+    # 9:00 AM IST = 3:30 AM UTC
+    - cron: '30 3 * * *'
+    # 3:00 PM IST = 9:30 AM UTC
+    - cron: '30 9 * * *'
+    # 9:00 PM IST = 3:30 PM UTC
+    - cron: '30 15 * * *'
   
   # Allow manual trigger
   workflow_dispatch:
