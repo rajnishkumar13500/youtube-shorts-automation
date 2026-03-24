@@ -53,22 +53,21 @@ class VideoAutomationScheduler:
         
         logger.info("Automation scheduler initialized successfully")
     
-    def process_pending_videos(self, max_videos: int = None, sheet_name: str = "Videos"):
+    def process_pending_videos(self, max_videos: int = None):
         """
         Process all pending videos from Google Sheets.
         
         Args:
             max_videos: Maximum number of videos to process (None = all)
-            sheet_name: Name of the sheet tab
         """
         try:
             logger.info("=" * 80)
             logger.info("Starting video automation process")
             logger.info("=" * 80)
             
-            # Read pending videos from Google Sheets
+            # Read pending videos from Google Sheets (auto-detects sheet name)
             logger.info("Reading pending videos from Google Sheets")
-            video_topics = self.sheets_reader.read_video_topics(sheet_name=sheet_name)
+            video_topics = self.sheets_reader.read_video_topics()
             
             if not video_topics:
                 logger.info("No pending videos found")
@@ -94,7 +93,7 @@ class VideoAutomationScheduler:
                     self.sheets_reader.update_status(
                         row_number=video_info['row_number'],
                         status="processing",
-                        sheet_name=sheet_name
+                        sheet_name=video_info.get('sheet_name')
                     )
                     
                     # Generate video
@@ -123,7 +122,7 @@ class VideoAutomationScheduler:
                         row_number=video_info['row_number'],
                         status="completed",
                         video_url=upload_result['video_url'],
-                        sheet_name=sheet_name
+                        sheet_name=video_info.get('sheet_name')
                     )
                     
                     logger.info(f"✓ Video {i}/{len(video_topics)} completed successfully")
@@ -142,7 +141,7 @@ class VideoAutomationScheduler:
                         self.sheets_reader.update_status(
                             row_number=video_info['row_number'],
                             status=f"failed: {str(e)[:100]}",
-                            sheet_name=sheet_name
+                            sheet_name=video_info.get('sheet_name')
                         )
                     except Exception as update_error:
                         logger.error(f"Failed to update error status: {update_error}")
@@ -321,7 +320,6 @@ def main():
     parser.add_argument("--spreadsheet-id", help="Google Sheets spreadsheet ID")
     parser.add_argument("--youtube-secrets", help="Path to YouTube OAuth2 client secrets JSON")
     parser.add_argument("--max-videos", type=int, help="Maximum number of videos to process")
-    parser.add_argument("--sheet-name", default="Videos", help="Sheet name (default: Videos)")
     parser.add_argument("--output-dir", default="output", help="Output directory")
     
     args = parser.parse_args()
@@ -337,8 +335,7 @@ def main():
         
         # Process pending videos
         scheduler.process_pending_videos(
-            max_videos=args.max_videos,
-            sheet_name=args.sheet_name
+            max_videos=args.max_videos
         )
         
     except Exception as e:
