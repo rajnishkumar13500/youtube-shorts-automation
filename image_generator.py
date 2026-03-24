@@ -115,7 +115,7 @@ def generate_ai_image_prompts(script: str, audio_duration: float, topic: str = N
     # Extract dialogue text from timings
     dialogues_text = [t.get('text', t.get('dialogue', '')) for t in dialogue_timings]
     
-    prompt = f"""You are a professional YouTube Shorts visual director. Generate detailed, cinematic image prompts for each dialogue segment.
+    prompt = f"""You are a professional YouTube Shorts visual director specializing in ultra-realistic, cinematic photography. Generate HIGHLY DETAILED, photorealistic image prompts for each dialogue segment.
 {topic_context}
 
 FULL SCRIPT CONTEXT (for understanding the complete story):
@@ -124,33 +124,46 @@ FULL SCRIPT CONTEXT (for understanding the complete story):
 DIALOGUE SEGMENTS TO VISUALIZE:
 {chr(10).join([f"{i+1}. {d}" for i, d in enumerate(dialogues_text)])}
 
-For EACH dialogue above, create a DETAILED image prompt following this format:
+For EACH dialogue above, create an ULTRA-DETAILED photorealistic image prompt following this format:
 
 DIALOGUE 1: [repeat the dialogue]
-IMAGE PROMPT: [Detailed cinematic description - 50-80 words]
-- Main subject, action, environment, lighting, colors, mood
-- Photorealistic, cinematic, professional photography style
-- 9:16 vertical format, dramatic lighting, high detail
+IMAGE PROMPT: [Ultra-detailed photorealistic description - 80-120 words]
+- PHOTOREALISTIC style, professional photography, cinematic quality
+- Detailed description of main subject/scene
+- Specific background details and environment
+- Thematic elements matching the topic (water theme for hydration, medical theme for health, fitness theme for exercise, etc.)
+- Lighting: natural light, studio lighting, golden hour, dramatic shadows, etc.
+- Camera angle and composition
+- Color palette and mood
+- Textures and materials
+- 9:16 vertical format optimized for mobile viewing
+- 8K quality, ultra-sharp, professional photography
 - MUST visually represent what's being discussed in this specific dialogue
-- MUST match the context from the full script and topic
-COLOR THEME: [dominant color - e.g., "golden yellow", "deep blue", "vibrant green"]
+COLOR THEME: [dominant color scheme - e.g., "cool blue water tones", "warm golden medical", "vibrant green fitness"]
 
 CRITICAL REQUIREMENTS:
-1. Each prompt must be HIGHLY DETAILED (50-80 words)
-2. Include: subject, action, environment, lighting, colors, composition, mood
-3. Use cinematic photography terms: "dramatic lighting", "shallow depth of field", "bokeh"
-4. Specify 9:16 vertical format
-5. Match visual to dialogue content - the image should make sense when viewed while hearing this dialogue
-6. Choose color theme that fits the mood and topic
-7. Make it photorealistic and professional
-8. Consider the full script context - images should tell a cohesive visual story
+1. ULTRA-REALISTIC PHOTOGRAPHIC STYLE - no cartoons, no 3D animation, no illustrations
+2. Each prompt must be EXTREMELY DETAILED (80-120 words minimum)
+3. Include: main subject, background details, thematic elements, lighting, camera angle, textures, colors, mood
+4. Use photography terms: "shallow depth of field", "bokeh", "natural lighting", "macro shot", "wide angle", "golden hour"
+5. Match theme to topic:
+   - Water/hydration topics: water droplets, glasses of water, blue aquatic backgrounds, fresh clean aesthetic
+   - Health/medical topics: medical imagery, clean clinical backgrounds, health symbols, professional medical aesthetic
+   - Fitness/exercise topics: gym equipment, active poses, energetic backgrounds, athletic aesthetic
+   - Food/nutrition topics: fresh ingredients, healthy meals, vibrant food photography
+   - Mental health topics: calm serene environments, peaceful nature, meditation spaces
+6. Specify 9:16 vertical format for mobile
+7. Match visual to dialogue content - image should enhance the message
+8. Choose realistic color palettes that look professional
+9. Make it look like a professional magazine or documentary photograph
+10. Consider the full script context - images should tell a cohesive visual story
 
 EXAMPLE (for topic "benefits of drinking water"):
 DIALOGUE 1: Kya aap jaante hain agar aap roz 8 glass paani peete hain toh kya hoga?
-IMAGE PROMPT: Photorealistic close-up of a shocked person with wide eyes and open mouth, hands on cheeks in surprise, dramatic side lighting creating shadows on face, dark mysterious background with volumetric fog, floating holographic question mark glowing in neon cyan, cinematic composition with shallow depth of field, bokeh background, 9:16 vertical format, professional photography, high detail, mysterious and attention-grabbing mood
-COLOR THEME: neon cyan and deep blue
+IMAGE PROMPT: Ultra-realistic close-up photograph of a crystal-clear glass of pure water with condensation droplets on the outside, placed on a clean white marble countertop, soft natural window light from the left creating subtle reflections and highlights on the water surface, background shows a blurred modern kitchen with hints of fresh fruits and greenery, water droplets suspended in mid-air around the glass creating a dynamic splash effect, cool blue and cyan color palette with white highlights, shallow depth of field with bokeh effect, professional product photography style, 8K ultra-sharp detail showing every water droplet and reflection, 9:16 vertical mobile format, fresh clean healthy aesthetic, cinematic composition
+COLOR THEME: cool blue water tones with white highlights
 
-Now generate prompts for all {len(dialogue_timings)} dialogues:"""
+Now generate ultra-realistic photographic prompts for all {len(dialogue_timings)} dialogues:"""
 
     try:
         logger_image_generator.info("Sending prompt to Groq AI...")
@@ -161,7 +174,7 @@ Now generate prompts for all {len(dialogue_timings)} dialogues:"""
             messages=[
                 {
                     "role": "system",
-                    "content": "You are an expert visual director for YouTube Shorts. Create detailed, cinematic image prompts that perfectly match dialogue content AND the overall video topic. Use the full script context to understand the story being told. Be specific about lighting, composition, colors, and mood. Each image should visually represent what's being discussed at that moment."
+                    "content": "You are an expert visual director for YouTube Shorts specializing in ultra-realistic, cinematic photography. Create HIGHLY DETAILED photorealistic image prompts that perfectly match dialogue content AND the overall video topic. Use the full script context to understand the story. Be EXTREMELY specific about: main subject details, background elements, thematic elements (water theme for hydration, medical theme for health, etc.), lighting setup, camera angle, textures, materials, color palette, and mood. Each image should look like a professional magazine photograph or documentary shot - ultra-realistic, 8K quality, cinematic composition. NO cartoons, NO 3D animation, NO illustrations - only photorealistic imagery. Make it mobile-optimized (9:16) and visually stunning."
                 },
                 {
                     "role": "user",
@@ -266,11 +279,11 @@ def parse_ai_prompts_with_timing(ai_response: str, dialogue_timings: List[Dict])
         
         prompts.append({
             'dialogue': dialogue_text,
-            'prompt': f"Cinematic scene for: {dialogue_text}, photorealistic, dramatic lighting, 9:16 vertical format",
+            'prompt': f"Ultra-realistic photorealistic scene: {dialogue_text}, professional photography, cinematic lighting, 8K quality, natural colors, 9:16 vertical format",
             'start_time': timing['start'],
             'end_time': timing['end'],
             'duration': timing['duration'],
-            'color_theme': "golden yellow",
+            'color_theme': "natural realistic tones",
             'scene_number': i + 1
         })
     
@@ -301,7 +314,7 @@ def generate_fallback_prompts_with_timing(dialogue_timings: List[Dict]) -> List[
         # Get dialogue text (support both 'text' from Whisper and 'dialogue' from fallback)
         dialogue_text = timing.get('text', timing.get('dialogue', ''))
         
-        prompt = f"Professional cinematic scene: {dialogue_text}, photorealistic, dramatic lighting, high detail, 9:16 vertical format, professional photography"
+        prompt = f"Ultra-realistic photorealistic scene: {dialogue_text}, professional photography, cinematic lighting, 8K quality, sharp details, natural colors, 9:16 vertical format, magazine quality"
         
         logger_image_generator.warning(f"Prompt {i+1}:")
         logger_image_generator.warning(f"  Dialogue: {dialogue_text[:80]}...")
@@ -350,7 +363,7 @@ def parse_ai_prompts(ai_response: str, dialogues: List[str], audio_duration: flo
         
         # Extract color theme
         color_match = re.search(r'COLOR THEME:\s*(.+?)(?=\n|$)', section)
-        color_theme = color_match.group(1).strip() if color_match else "golden yellow"
+        color_theme = color_match.group(1).strip() if color_match else "natural realistic tones"
         
         # LOG THE FULL PROMPT FOR DEBUGGING
         logger_image_generator.info(f"=" * 80)
@@ -373,9 +386,9 @@ def parse_ai_prompts(ai_response: str, dialogues: List[str], audio_duration: flo
         i = len(prompts)
         prompts.append({
             'dialogue': dialogues[i],
-            'prompt': f"Cinematic scene for: {dialogues[i]}, photorealistic, dramatic lighting, 9:16 vertical format",
+            'prompt': f"Ultra-realistic photorealistic scene: {dialogues[i]}, professional photography, cinematic lighting, 8K quality, natural colors, 9:16 vertical format",
             'duration': duration_per_scene,
-            'color_theme': "golden yellow",
+            'color_theme': "natural realistic tones",
             'scene_number': i + 1
         })
     

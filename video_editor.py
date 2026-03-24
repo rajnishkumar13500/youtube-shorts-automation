@@ -338,21 +338,19 @@ def add_subtitles(
         # Escape Windows paths for FFmpeg
         subtitles_path_escaped = subtitles_path.replace('\\', '/').replace(':', '\\:')
         
-        # Professional subtitle style - BOTTOM CENTER positioning
+        # Small subtitle style - BOTTOM CENTER positioning
         # Alignment values: 1=left, 2=center, 3=right (bottom row)
-        #                   5=left, 6=center, 7=right (middle row)
-        #                   9=left, 10=center, 11=right (top row)
         subtitle_style = (
-            "FontName=Arial Black,"       # Use Arial Black (more widely available than Montserrat)
-            "FontSize=18,"                 # Professional size - not too large
+            "FontName=Arial,"              # Use Arial (clean and readable)
+            "FontSize=14,"                 # Small font size as requested
             "PrimaryColour=" + primary_color + ","
             "OutlineColour=&H00000000,"    # Black outline
             "BackColour=&H80000000,"       # Semi-transparent black background
             "Bold=1,"                      # Bold text
-            "Outline=2,"                   # Medium outline for readability
-            "Shadow=1,"                    # Subtle shadow for depth
-            "Alignment=2,"                 # Bottom center (value 2)
-            "MarginV=60,"                  # 60 pixels from bottom (less intrusive)
+            "Outline=2,"                   # Outline for contrast
+            "Shadow=1,"                    # Subtle shadow
+            "Alignment=2,"                 # Bottom center
+            "MarginV=20,"                  # 20 pixels from bottom (small space)
             "MarginL=30,"                  # 30 pixels from left
             "MarginR=30"                   # 30 pixels from right
         )

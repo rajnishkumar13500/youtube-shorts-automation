@@ -820,16 +820,41 @@ def populate_spreadsheet():
         print()
         print("Writing to Google Sheets...")
         
+        # Get spreadsheet metadata to find sheet names
+        spreadsheet = service.spreadsheets().get(spreadsheetId=spreadsheet_id).execute()
+        sheets = spreadsheet.get('sheets', [])
+        
+        if not sheets:
+            print("✗ No sheets found in spreadsheet")
+            return False
+        
+        # Try to find 'Videos' sheet, otherwise use first sheet
+        sheet_name = None
+        for sheet in sheets:
+            title = sheet['properties']['title']
+            if title.lower() == 'videos':
+                sheet_name = title
+                break
+        
+        if not sheet_name:
+            # Use first sheet
+            sheet_name = sheets[0]['properties']['title']
+            print(f"ℹ 'Videos' sheet not found, using sheet: '{sheet_name}'")
+        else:
+            print(f"✓ Found sheet: '{sheet_name}'")
+        
         # Clear existing data first
-        sheet_name = 'Videos'
         range_name = f'{sheet_name}!A1:D1000'
         
-        service.spreadsheets().values().clear(
-            spreadsheetId=spreadsheet_id,
-            range=range_name
-        ).execute()
-        
-        print("✓ Cleared existing data")
+        try:
+            service.spreadsheets().values().clear(
+                spreadsheetId=spreadsheet_id,
+                range=range_name
+            ).execute()
+            print("✓ Cleared existing data")
+        except HttpError as clear_error:
+            print(f"⚠ Could not clear existing data: {clear_error}")
+            print("  Continuing anyway...")
         
         # Write new data
         body = {
