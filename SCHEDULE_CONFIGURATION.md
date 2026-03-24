@@ -1,17 +1,34 @@
-# Schedule Configuration - 3 Videos Daily
+# Schedule Configuration - 4 Videos Daily
 
-Your automation is already configured to post 3 videos per day automatically!
+Your automation is configured to post 4 videos per day automatically!
 
 ---
 
-## Current Schedule
+## Current Schedule (India IST)
 
 **File:** `.github/workflows/daily-videos.yml`
 
-**Current times (UTC):**
-- Video 1: 9:00 AM UTC
-- Video 2: 3:00 PM UTC
-- Video 3: 9:00 PM UTC
+**Posting times:**
+- Video 1: 6:00 AM IST (12:30 AM UTC)
+- Video 2: 4:00 PM IST (10:30 AM UTC)
+- Video 3: 6:20 PM IST (12:50 PM UTC)
+- Video 4: 8:30 PM IST (3:00 PM UTC)
+
+---
+
+## Schedule Details
+
+```yaml
+schedule:
+  # 6:00 AM IST = 12:30 AM UTC
+  - cron: '30 0 * * *'
+  # 4:00 PM IST = 10:30 AM UTC
+  - cron: '30 10 * * *'
+  # 6:20 PM IST = 12:50 PM UTC
+  - cron: '50 12 * * *'
+  # 8:30 PM IST = 3:00 PM UTC
+  - cron: '0 15 * * *'
+```
 
 ---
 
@@ -19,7 +36,21 @@ Your automation is already configured to post 3 videos per day automatically!
 
 ### India (IST = UTC+5:30)
 
-If you want videos at 9 AM, 3 PM, 9 PM IST:
+Current configuration (4 videos per day):
+
+```yaml
+schedule:
+  # 6:00 AM IST = 12:30 AM UTC
+  - cron: '30 0 * * *'
+  # 4:00 PM IST = 10:30 AM UTC
+  - cron: '30 10 * * *'
+  # 6:20 PM IST = 12:50 PM UTC
+  - cron: '50 12 * * *'
+  # 8:30 PM IST = 3:00 PM UTC
+  - cron: '0 15 * * *'
+```
+
+If you want different times (e.g., 9 AM, 3 PM, 9 PM IST):
 
 ```yaml
 schedule:
@@ -240,13 +271,23 @@ GitHub doesn't show next scheduled run time, but it will run at your configured 
 ## Current Configuration
 
 Your current setup:
-- ✅ 3 videos per day
-- ✅ Times: 9 AM, 3 PM, 9 PM UTC
+- ✅ 4 videos per day
+- ✅ Times: 6:00 AM, 4:00 PM, 6:20 PM, 8:30 PM IST
 - ✅ Pulls topics from Google Sheets
 - ✅ Uploads to YouTube automatically
 - ✅ Updates status in Google Sheets
 
 **Everything is ready!** Videos will start posting automatically at the scheduled times.
+
+---
+
+## Content Planning
+
+With 4 videos per day:
+- 4 videos/day × 30 days = 120 videos/month
+- 4 videos/day × 365 days = 1,460 videos/year
+
+Your Google Sheets has 690 topics = 172.5 days of content (almost 6 months!)
 
 ---
 
@@ -272,4 +313,4 @@ Your current setup:
 
 **Your automation is live!** 🎉
 
-Videos will post automatically 3 times per day from your Google Sheets topics.
+Videos will post automatically 4 times per day from your Google Sheets topics.
