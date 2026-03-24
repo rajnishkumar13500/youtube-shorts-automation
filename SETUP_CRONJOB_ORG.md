@@ -167,6 +167,8 @@ Starting from the next scheduled time:
 
 All at the precise time you scheduled! 🎯
 
+**Note:** The GitHub Actions schedule is now disabled to prevent duplicate videos. Only cron-job.org will trigger the workflows.
+
 ---
 
 ## Monitoring
