@@ -1,0 +1,26 @@
+# Cloudflare Worker Configuration
+# YouTube Shorts Automation Scheduler
+
+name = "youtube-shorts-scheduler"
+main = "worker.js"
+compatibility_date = "2024-03-24"
+
+# Cron Triggers - 4 videos per day (India IST timezone)
+[triggers]
+crons = [
+  "0 6 * * *",   # 6:00 AM IST (12:30 AM UTC) - Morning video
+  "30 10 * * *", # 4:00 PM IST (10:30 AM UTC) - Afternoon video
+  "50 12 * * *", # 6:20 PM IST (12:50 PM UTC) - Evening video
+  "0 15 * * *"   # 8:30 PM IST (3:00 PM UTC) - Night video
+]
+
+# Environment variables (set these using wrangler secret)
+# GITHUB_TOKEN - Your GitHub Personal Access Token
+# GITHUB_REPO - Your repository (format: "username/repo-name")
+
+# Note: Cron times are in UTC
+# IST = UTC + 5:30
+# 6:00 AM IST = 12:30 AM UTC (0:30)
+# 4:00 PM IST = 10:30 AM UTC (10:30)
+# 6:20 PM IST = 12:50 PM UTC (12:50)
+# 8:30 PM IST = 3:00 PM UTC (15:00)
